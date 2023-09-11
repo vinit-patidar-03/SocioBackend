@@ -1,0 +1,52 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* Animation and styling for buttons */
+.btn {
+  background: linear-gradient(to right,red,orange);
+  background-clip: text;
+  color: transparent;
+}
+
+.userInput label
+{
+  transition: all 1s ease;
+}
+
+.passInput label
+{
+  transition: all 1s ease;
+}
+
+.userInput input:focus ~ label,
+.userInput input:valid ~ label
+{
+    top: -10px;
+    /* bottom: 15px; */
+    left: 0;
+    background: linear-gradient(to right,red,orange);
+    background-clip: text;
+    color: transparent;
+    font-size: 10px;
+    /* transition: all 0.5s ease-in; */
+}
+
+.passInput input:focus ~ label,
+.passInput input:valid ~ label
+{
+    top: -10px;
+    /* bottom: 15px; */
+    left: 0;
+    background: linear-gradient(to right,red,orange);
+    background-clip: text;
+    color: transparent;
+    font-size: 10px;
+    /* transition: all 0.5s ease-in; */
+}
+
+.createdPostCard
+{
+  box-shadow: 0px 0px 5px gray;
+}
