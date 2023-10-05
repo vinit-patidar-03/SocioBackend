@@ -1,5 +1,5 @@
 const express = require('express');
-// require('dotenv').config({path: './.env'});
+require('dotenv').config({path: './.env'});
 const cors = require('cors');
 const ConnectToMongo = require('./db');
 // const fileupload = require('express-fileupload');
@@ -20,7 +20,11 @@ ConnectToMongo();
 app.use(express.json());
 
 //use cors(cross origin resources sharing) policy when we are sharing the data from one port to another port otherwise it will give an error.
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL,
+    methods: ["GET","PUT","POST","DELETE"],
+    credentials: true
+}));
 
 app.use('/instagram/auth',require('./routes/auth'));
 app.use('/instagram/posts',require('./routes/posts'));
