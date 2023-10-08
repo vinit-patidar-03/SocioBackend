@@ -25,6 +25,9 @@ app.use(cors());
 app.use('/instagram/auth',require('./routes/auth'));
 app.use('/instagram/posts',require('./routes/posts'));
 
+app.get('/',(req,res)=>{
+    res.send('started')
+})
 app.listen(PORT,()=>
 {
     console.log(`server is running on port http://localhost:${PORT}`)
