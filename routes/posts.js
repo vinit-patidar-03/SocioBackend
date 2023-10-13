@@ -3,7 +3,7 @@ const checkUser = require('../middleware/checkUser');
 const Post = require('../models/Post');
 const router = express.Router();
 
-//For posts by all users
+// Create Post API
 router.post('/createPosts', checkUser, async (req, res) => {
      try {
           let success = false;
@@ -26,7 +26,7 @@ router.post('/createPosts', checkUser, async (req, res) => {
      }
 })
 
-//For individual posts
+//Reading Posts for Individual User
 router.get('/individualPosts', checkUser, async (req, res) => {
 
      let success = false;
@@ -39,6 +39,7 @@ router.get('/individualPosts', checkUser, async (req, res) => {
      }
 })
 
+//Delete post by individual user
 router.delete('/deletePost', async (req, res) => {
      try {
           let success = false;
@@ -51,31 +52,51 @@ router.delete('/deletePost', async (req, res) => {
           console.error('error')
      }
 })
+
+//Reading all the posts created by users
 router.get('/posts', async (req, res) => {
      const Posts = await Post.find();
      res.status(200).send(Posts);
 })
 
+//like and dislike posts
 router.put('/like', checkUser, async (req, res) => {
      try {
           let success = false;
           const { postId } = req.body;
           let posts = await Post.findById(postId);
-          // console.log(posts.likes.includes(req.user.id));
-          if(posts.likes.includes(req.user.id)) 
-          {
-               await Post.findByIdAndUpdate(postId, {$pull : { likes : req.user.id } }, { new: true }) 
-               res.json({success,"msg":"post unliked"})
+
+          if (posts.likes.includes(req.user.id)) {
+               await Post.findByIdAndUpdate(postId, { $pull: { likes: req.user.id } }, { new: true })
+               res.json({ success, "msg": "post unliked" })
           }
-          else
-          { 
-               await Post.findByIdAndUpdate(postId, {$push : { likes : req.user.id } }, { new: true })
+          else {
+               await Post.findByIdAndUpdate(postId, { $push: { likes: req.user.id } }, { new: true })
                success = true;
-               res.json({success,"msg":"post liked"});
+               res.json({ success, "msg": "post liked" });
           }
      } catch (error) {
           res.status(403).send('Unable to update');
      }
+})
+
+//comment on post
+router.put('/comment',checkUser, async (req, res) => {
+     try {
+          const { postId } = req.body;
+          const newComment = {
+               comment: req.body.comment,
+               postedby: req.user.id
+          }
+
+           await Post.findByIdAndUpdate(postId,{$push: {comments : newComment}},{new: true});
+
+           res.status(201).send({success: true,msg: "commented successfully"});
+     } catch (error) {
+          res.status(201).send({success: false,msg: "some error occured"});
+     }
+
+
 
 })
 module.exports = router;

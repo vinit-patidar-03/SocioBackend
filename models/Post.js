@@ -21,10 +21,18 @@ const PostSchema = new Schema({
         default: 'No Photos',
         required:true
     },
-    // likes:[{
-    //     type:mongoose.Schema.Types.ObjectId,
-    //     ref: 'User'
-    // }],
+    comments:[{
+        comment:{
+            type:String,
+            required: true
+        },
+        postedby:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+            required: true
+        }
+    }],
+ 
     timestamp:{
         type: Date,
         default: Date.now
