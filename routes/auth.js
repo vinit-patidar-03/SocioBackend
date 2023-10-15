@@ -14,22 +14,22 @@ router.post('/signup', [body('name', 'enter valid name').isLength({ min: 3 }), b
     //extracting user data came into req
     const { name, email, password, confirm_password } = req.body;
 
-    //checking result of applied validations.
-    let success = false;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(400).json({ success, errors: errors.array() });
-    }
 
     //Creating User by some validations and Mongoose User Schema.
     try {
+        //checking result of applied validations.
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ success: false, errors: errors.array() });
+        }
+
         let user = await User.findOne({ email });
         if (user) {
-            return res.status(422).json({ success, msg: 'user with this email already exists' })
+            return res.status(422).json({ success: false, msg: 'user with this email already exists' })
         }
 
         if (password !== confirm_password) {
-            return res.status(422).json({ success, msg: 'enter valid confirm password' });
+            return res.status(422).json({ success: false, msg: 'enter valid confirm password' });
         }
 
         //Password security
@@ -45,15 +45,15 @@ router.post('/signup', [body('name', 'enter valid name').isLength({ min: 3 }), b
 
         //Token issue based on Id
         const data = {
-          user:{
+            user: {
                 id: user.id,
-                name: user.name
+                name: user.name,
             }
         }
 
         const authToken = jwt.sign(data, jwt_secret);
         success = true;
-        res.status(200).json({ success, authToken });
+        res.status(200).json({ success: true, authToken });
 
     } catch (error) {
         res.status(500).send('Internal Server Error');
@@ -63,44 +63,37 @@ router.post('/signup', [body('name', 'enter valid name').isLength({ min: 3 }), b
 
 //login endpoint
 router.post('/login', [body('email', 'enter valid email').isEmail(), body('password', "password can't be blank").exists()], async (req, res) => {
-    let success = false;
     const { email, password } = req.body;
-     
-    //checking validation results
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        return res.status(422).send({ success, errors: errors.array() })
-    }
 
     try {
+        //checking validation results
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(422).send({ success: false, errors: errors.array() })
+        }
 
         //checking user if it exists
         let user = await User.findOne({ email });
-
         if (!user) {
-            return res.status(404).send({ success, message: "user doesn't exist" });
+            return res.status(404).send({ success: false, msg: "user doesn't exist" });
         }
 
         const dbPassword = user.password;
         const comResult = await bcrypt.compare(password, dbPassword);
-
         if (!comResult) {
-            return res.status(422).send({ message: 'please enter valid creadentials' });
+            return res.status(422).send({ msg: 'please enter valid creadentials' });
         }
 
         const data = {
-            user:{
-                  id: user.id,
-                  name: user.name
-              }
-          }
-
+            user: {
+                id: user.id,
+                name: user.name,
+            }
+        }
         const authToken = jwt.sign(data, jwt_secret);
-        success = true;
-        res.status(200).send({ success, authToken });
-
+        res.status(200).send({ success: true, authToken });
     } catch (error) {
-        res.status(500).send('Internal Server Error');
+        res.status(500).send({ msg: 'Internal Server Error' });
     }
 })
 
@@ -115,9 +108,38 @@ router.get('/getUser', checkUser, async (req, res) => {
     }
 })
 
-// router.put('/likes',checkUser,(req,res)=>
-// {
-    
-// })
+//other users
+router.get('/getuser/:id',async (req,res)=>{
+    try {
+        const userId = req.params.id;
+        let user = await User.findById(userId).select('-password');
+        res.send(user);
+    } catch (error) {
+        console.log(error);
+    }
+})
+
+
+//Follow other Users 
+router.put('/follow/:id', checkUser, async (req, res) => {
+    try {
+        await User.findById(req.params.id, { $push: { followers: req.user.id } });
+        res.status(201).send({ success: true, msg: "followed successfully" });
+    } catch (error) {
+        res.status(404).send({ success: false, msg: "some error occurred" });
+    }
+})
+
+//Edit profile
+router.put('/editProfile',checkUser,async (req,res)=>
+{
+    try {
+        const {bio, avatar} = req.body;
+        await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio, avatar: avatar}});
+        res.status(200).send({success: true, msg:"updated successfully"});
+    } catch (error) {
+        res.status(401).send({success: false, msg: "some error occured"});
+    }
+})
 
 module.exports = router;

@@ -20,8 +20,8 @@ app.use(express.json());
 //use cors(cross origin resources sharing) policy when we are sharing the data from one port to another port otherwise it will give an error.
 app.use(cors());
 
-app.use('/instagram/auth',require('./routes/auth'));
-app.use('/instagram/posts',require('./routes/posts'));
+app.use('/sociogram/auth',require('./routes/auth'));
+app.use('/sociogram/posts',require('./routes/posts'));
 
 app.get('/',(req,res)=>{
     res.send('started')

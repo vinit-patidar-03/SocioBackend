@@ -17,7 +17,8 @@ router.post('/createPosts', checkUser, async (req, res) => {
                description: description,
                photo: photo,
                user: req.user.id,
-               name: req.user.name
+               name: req.user.name,
+               avatar: req.user.image
           })
           success = true;
           res.status(200).send({ success, msg: 'post created successfully' });
@@ -81,22 +82,36 @@ router.put('/like', checkUser, async (req, res) => {
 })
 
 //comment on post
-router.put('/comment',checkUser, async (req, res) => {
+router.put('/comment', checkUser, async (req, res) => {
      try {
+
           const { postId } = req.body;
           const newComment = {
                comment: req.body.comment,
                postedby: req.user.id
           }
+          await Post.findByIdAndUpdate(postId, { $push: { comments: newComment } }, { new: true });
+          res.status(201).send({success: true, msg: "commented successfully"})
 
-           await Post.findByIdAndUpdate(postId,{$push: {comments : newComment}},{new: true});
-
-           res.status(201).send({success: true,msg: "commented successfully"});
      } catch (error) {
-          res.status(201).send({success: false,msg: "some error occured"});
+
+          res.status(404).send({ success: false, msg: "some error occured" });
+
      }
-
-
-
 })
+
+//Get single post to show comments
+router.get('/post/:id', async (req, res) => {
+     try {
+
+          const post = await Post.findById(req.params.id);
+          res.status(200).send(post);
+
+     } catch (error) {
+
+          res.status(404).send({ success: false, msg: "some error occured" });
+
+     }
+})
+
 module.exports = router;
