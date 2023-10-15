@@ -7,7 +7,7 @@ const router = express.Router();
 router.post('/createPosts', checkUser, async (req, res) => {
      try {
           let success = false;
-          const { description, photo } = req.body;
+          const { description, photo, avatar } = req.body;
 
           if (!description || !photo) {
                return res.status(422).json({ success, msg: 'Please Fill all the Required Fields' });
@@ -18,7 +18,7 @@ router.post('/createPosts', checkUser, async (req, res) => {
                photo: photo,
                user: req.user.id,
                name: req.user.name,
-               avatar: req.user.image
+               avatar: avatar
           })
           success = true;
           res.status(200).send({ success, msg: 'post created successfully' });
@@ -99,6 +99,18 @@ router.put('/comment', checkUser, async (req, res) => {
 
      }
 })
+
+//avatar Updates in post
+router.put('/avatarUpdate', checkUser, async (req, res) => {
+     try {
+          const { avatar } = req.body;
+          await Post.updateMany({user: req.user.id},{$set:{avatar: avatar}});
+          res.send({success: true,msg:"updated successfully"});
+     } catch (error) {
+          res.status(403).send('Unable to update');
+     }
+})
+
 
 //Get single post to show comments
 router.get('/post/:id', async (req, res) => {
