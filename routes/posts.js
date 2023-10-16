@@ -127,7 +127,7 @@ router.get('/post/:id', async (req, res) => {
 })
 
 //Get single posts related to other users
-router.get('/post/:id', async (req, res) => {
+router.get('/posts/:id', async (req, res) => {
      try {
 
           const post = await Post.find({user: req.params.id});
