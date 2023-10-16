@@ -135,7 +135,17 @@ router.put('/editProfile',checkUser,async (req,res)=>
 {
     try {
         const {bio, avatar} = req.body;
-        await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio, avatar: avatar}});
+        if(avatar && bio !=='')
+        {
+            await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio, avatar: avatar}});
+        }
+        else if(avatar)
+        {
+            await User.findByIdAndUpdate(req.user.id,{$set: {avatar: avatar}});
+        }
+        else{
+            await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio}});
+        }
         res.status(200).send({success: true, msg:"updated successfully"});
     } catch (error) {
         res.status(401).send({success: false, msg: "some error occured"});
