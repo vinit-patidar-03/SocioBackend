@@ -126,4 +126,18 @@ router.get('/post/:id', async (req, res) => {
      }
 })
 
+//Get single posts related to other users
+router.get('/post/:id', async (req, res) => {
+     try {
+
+          const post = await Post.find({user: req.params.id});
+          res.status(200).send(post);
+
+     } catch (error) {
+
+          res.status(404).send({ success: false, msg: "some error occured" });
+
+     }
+})
+
 module.exports = router;
