@@ -15,6 +15,9 @@ const UserSchema = new Schema(
         bio: {
             type: String,
         },
+        website:{
+            type: String
+        },
         followers: [
             {
                 type: mongoose.Schema.Types.ObjectId,
