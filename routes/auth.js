@@ -109,7 +109,7 @@ router.get('/getUser', checkUser, async (req, res) => {
 })
 
 //other users
-router.get('/getuser/:id',async (req,res)=>{
+router.get('/getuser/:id', async (req, res) => {
     try {
         const userId = req.params.id;
         let user = await User.findById(userId).select('-password');
@@ -131,27 +131,13 @@ router.put('/follow/:id', checkUser, async (req, res) => {
 })
 
 //Edit profile
-router.put('/editProfile',checkUser,async (req,res)=>
-{
+router.put('/editProfile', checkUser, async (req, res) => {
     try {
-        const {bio, avatar,website} = req.body;
-        if(avatar && bio !=='')
-        {
-            await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio, avatar: avatar,website: website}});
-        }
-        else if(avatar)
-        {
-            await User.findByIdAndUpdate(req.user.id,{$set: {avatar: avatar, website: website}});
-        }
-        else if(bio){
-            await User.findByIdAndUpdate(req.user.id,{$set: {bio: bio, website: website}});
-        }
-        else{
-            await User.findByIdAndUpdate(req.user.id,{$set: {website: website}});
-        }
-        res.status(200).send({success: true, msg:"updated successfully"});
+        const { bio, avatar, website } = req.body;
+        await User.findByIdAndUpdate(req.user.id, { $set: { bio: bio, avatar: avatar, website: website } });
+        res.status(200).send({ success: true, msg: "updated successfully" });
     } catch (error) {
-        res.status(401).send({success: false, msg: "some error occured"});
+        res.status(401).send({ success: false, msg: "some error occured" });
     }
 })
 
