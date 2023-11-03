@@ -100,6 +100,19 @@ router.put('/comment', checkUser, async (req, res) => {
      }
 })
 
+//delete comment
+router.put('/deleteComment', async (req,res)=>{
+   const {postId,commentId} = req.body;
+
+   try {
+     await Post.findByIdAndUpdate(postId,{$pull : {comments: {_id: commentId}}});
+     res.send('deleted successfully')
+   } catch (error) {
+     res.send('Internal Server error')
+   }
+
+})
+
 //avatar Updates in post
 router.put('/avatarUpdate', checkUser, async (req, res) => {
      try {
