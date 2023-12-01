@@ -121,13 +121,20 @@ router.get('/getuser/:id', async (req, res) => {
 
 
 //Follow other Users 
-router.put('/follow/:id', checkUser, async (req, res) => {
+router.put('/follow/:id',checkUser, async (req, res) => {
     try {
-        await User.findById(req.params.id, { $push: { followers: req.user.id } });
-        res.status(201).send({ success: true, msg: "followed successfully" });
-    } catch (error) {
-        res.status(404).send({ success: false, msg: "some error occurred" });
-    }
+        const {id} = req.params;
+        let user = await User.findById(id);
+        if(user.followers.includes(req.user.id)){
+            await User.findByIdAndUpdate(id,{$pull: {followers: req.user.id}});
+            res.send({success: true,msg: "Now you are unfollowing the user"});
+        }else{
+            await User.findByIdAndUpdate(id,{$push: {followers: req.user.id}});
+            res.send({success: true, msg: "Now you are following the user"})
+        }
+   } catch (error) {
+        res.status(403).send('Unable to update');
+   }
 })
 
 //Edit profile
