@@ -3,7 +3,8 @@ const jwt_secret = 'instagram2.o';
 
 const checkUser = (req,res,next)=>
 {
-   const token = req.header('authToken');
+   const token = req.header("authToken");
+   console.log(token);
    if(!token)
    {
      return res.status(401).send({error:'Access Denied'});

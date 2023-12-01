@@ -124,12 +124,15 @@ router.get('/getuser/:id', async (req, res) => {
 router.put('/follow/:id',checkUser, async (req, res) => {
     try {
         const {id} = req.params;
+        console.log(req.header('authToken'));
         let user = await User.findById(id);
         if(user.followers.includes(req.user.id)){
             await User.findByIdAndUpdate(id,{$pull: {followers: req.user.id}});
+            await User.findByIdAndUpdate(req.user.id,{$pull: {followings: id}});
             res.send({success: true,msg: "Now you are unfollowing the user"});
         }else{
             await User.findByIdAndUpdate(id,{$push: {followers: req.user.id}});
+            await User.findByIdAndUpdate(req.user.id,{$push: {followings: id}});
             res.send({success: true, msg: "Now you are following the user"})
         }
    } catch (error) {
