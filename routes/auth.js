@@ -124,7 +124,6 @@ router.get('/getuser/:id', async (req, res) => {
 router.put('/follow/:id',checkUser, async (req, res) => {
     try {
         const {id} = req.params;
-        console.log(req.header('authToken'));
         let user = await User.findById(id);
         if(user.followers.includes(req.user.id)){
             await User.findByIdAndUpdate(id,{$pull: {followers: req.user.id}});
