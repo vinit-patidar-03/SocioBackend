@@ -56,6 +56,7 @@ router.delete('/deletePost', async (req, res) => {
 
 //Reading all the posts created by users
 router.get('/posts', async (req, res) => {
+ 
      const Posts = await Post.find();
      res.status(200).send(Posts);
 })
