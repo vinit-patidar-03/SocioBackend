@@ -56,8 +56,8 @@ router.delete('/deletePost', async (req, res) => {
 
 //Reading all the posts created by users
 router.get('/posts', async (req, res) => {
- 
-     const Posts = await Post.find().sort('-timestamp');
+     const { skip, limit } = req.query;
+     const Posts = await Post.find().sort('-timestamp').skip(skip).limit(limit);
      res.status(200).send(Posts);
 })
 
@@ -92,7 +92,7 @@ router.put('/comment', checkUser, async (req, res) => {
                postedby: req.user.id
           }
           await Post.findByIdAndUpdate(postId, { $push: { comments: newComment } }, { new: true });
-          res.status(201).send({success: true, msg: "commented successfully"})
+          res.status(201).send({ success: true, msg: "commented successfully" })
 
      } catch (error) {
 
@@ -102,15 +102,15 @@ router.put('/comment', checkUser, async (req, res) => {
 })
 
 //delete comment
-router.put('/deleteComment', async (req,res)=>{
-   const {postId,commentId} = req.body;
+router.put('/deleteComment', async (req, res) => {
+     const { postId, commentId } = req.body;
 
-   try {
-     await Post.findByIdAndUpdate(postId,{$pull : {comments: {_id: commentId}}});
-     res.send('deleted successfully')
-   } catch (error) {
-     res.send('Internal Server error')
-   }
+     try {
+          await Post.findByIdAndUpdate(postId, { $pull: { comments: { _id: commentId } } });
+          res.send('deleted successfully')
+     } catch (error) {
+          res.send('Internal Server error')
+     }
 
 })
 
@@ -118,8 +118,8 @@ router.put('/deleteComment', async (req,res)=>{
 router.put('/avatarUpdate', checkUser, async (req, res) => {
      try {
           const { avatar } = req.body;
-          await Post.updateMany({user: req.user.id},{$set:{avatar: avatar}});
-          res.send({success: true,msg:"updated successfully"});
+          await Post.updateMany({ user: req.user.id }, { $set: { avatar: avatar } });
+          res.send({ success: true, msg: "updated successfully" });
      } catch (error) {
           res.status(403).send('Unable to update');
      }
@@ -144,7 +144,7 @@ router.get('/post/:id', async (req, res) => {
 router.get('/posts/:id', async (req, res) => {
      try {
 
-          const post = await Post.find({user: req.params.id});
+          const post = await Post.find({ user: req.params.id });
           res.status(200).send(post);
 
      } catch (error) {
