@@ -101,7 +101,13 @@ router.post('/login', [body('email', 'enter valid email').isEmail(), body('passw
 router.get('/getUser', checkUser, async (req, res) => {
     try {
         const UserId = req.user.id;
-        let user = await User.findById(UserId).select('-password');
+        let user = await User.findById(UserId).select('-password').populate({
+            path: 'followers',
+            select: '-password'
+        }).populate({
+            path: 'followings',
+            select: '-password'
+        });
         res.send(user);
     } catch (error) {
         console.log(error);
@@ -112,7 +118,13 @@ router.get('/getUser', checkUser, async (req, res) => {
 router.get('/getuser/:id', async (req, res) => {
     try {
         const userId = req.params.id;
-        let user = await User.findById(userId).select('-password');
+        let user = await User.findById(userId).select('-password').populate({
+            path: 'followers',
+            select: '-password'
+        }).populate({
+            path: 'followings',
+            select: '-password'
+        });
         res.send(user);
     } catch (error) {
         console.log(error);
@@ -121,22 +133,22 @@ router.get('/getuser/:id', async (req, res) => {
 
 
 //Follow other Users 
-router.put('/follow/:id',checkUser, async (req, res) => {
+router.put('/follow/:id', checkUser, async (req, res) => {
     try {
-        const {id} = req.params;
+        const { id } = req.params;
         let user = await User.findById(id);
-        if(user.followers.includes(req.user.id)){
-            await User.findByIdAndUpdate(id,{$pull: {followers: req.user.id}});
-            await User.findByIdAndUpdate(req.user.id,{$pull: {followings: id}});
-            res.send({success: true,msg: "Now you are unfollowing the user"});
-        }else{
-            await User.findByIdAndUpdate(id,{$push: {followers: req.user.id}});
-            await User.findByIdAndUpdate(req.user.id,{$push: {followings: id}});
-            res.send({success: true, msg: "Now you are following the user"})
+        if (user.followers.includes(req.user.id)) {
+            await User.findByIdAndUpdate(id, { $pull: { followers: req.user.id } });
+            await User.findByIdAndUpdate(req.user.id, { $pull: { followings: id } });
+            res.send({ success: true, msg: "Now you are unfollowing the user" });
+        } else {
+            await User.findByIdAndUpdate(id, { $push: { followers: req.user.id } });
+            await User.findByIdAndUpdate(req.user.id, { $push: { followings: id } });
+            res.send({ success: true, msg: "Now you are following the user" })
         }
-   } catch (error) {
+    } catch (error) {
         res.status(403).send('Unable to update');
-   }
+    }
 })
 
 //Edit profile
