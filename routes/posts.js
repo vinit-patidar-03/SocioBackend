@@ -7,15 +7,19 @@ const router = express.Router();
 router.post('/createPosts', checkUser, async (req, res) => {
      try {
           let success = false;
-          const { description, photo, avatar } = req.body;
+          const { description, photo, avatar, publicId } = req.body;
 
-          if (!description || !photo) {
+          if (!description || !photo || !publicId) {
                return res.status(422).json({ success, msg: 'Please Fill all the Required Fields' });
           }
 
+          console.log(photo, publicId);
           await Post.create({
                description: description,
-               photo: photo,
+               photo: {
+                    url: photo,
+                    publicId: publicId
+               },
                user: req.user.id,
                name: req.user.name,
                avatar: avatar
@@ -58,6 +62,7 @@ router.delete('/deletePost', async (req, res) => {
 router.get('/posts', async (req, res) => {
      const { skip, limit } = req.query;
      const Posts = await Post.find().sort('-timestamp').skip(skip).limit(limit);
+     console.log(Posts);
      res.status(200).send(Posts);
 })
 
