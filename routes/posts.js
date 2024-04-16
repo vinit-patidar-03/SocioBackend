@@ -7,18 +7,15 @@ const router = express.Router();
 router.post('/createPosts', checkUser, async (req, res) => {
      try {
           let success = false;
-          const { description, photo, avatar, publicId } = req.body;
+          const { description, photo, avatar } = req.body;
 
-          if (!description || !photo || !publicId) {
+          if (!description || !photo) {
                return res.status(422).json({ success, msg: 'Please Fill all the Required Fields' });
           }
 
           await Post.create({
                description: description,
-               photo: {
-                    url: photo,
-                    publicId: publicId
-               },
+               photo: photo,
                user: req.user.id,
                name: req.user.name,
                avatar: avatar

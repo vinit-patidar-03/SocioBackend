@@ -28,15 +28,8 @@ const PostSchema = new Schema({
     ],
 
     photo: {
-        url: {
-            type: String,
-            default: 'No Photos',
-            required: true
-        },
-        publicId: {
-            type: String,
-            required: true
-        }
+        type: String,
+        required: true
     },
 
     comments: [{
