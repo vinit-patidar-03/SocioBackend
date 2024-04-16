@@ -13,7 +13,6 @@ router.post('/createPosts', checkUser, async (req, res) => {
                return res.status(422).json({ success, msg: 'Please Fill all the Required Fields' });
           }
 
-          console.log(photo, publicId);
           await Post.create({
                description: description,
                photo: {
