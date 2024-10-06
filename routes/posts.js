@@ -45,7 +45,6 @@ router.delete('/deletePost', async (req, res) => {
      try {
           let success = false;
           const { id } = req.body;
-          console.log(id);
           await Post.findByIdAndDelete(id);
           success = true;
           res.json({ success, msg: "post deleted" });
@@ -57,8 +56,18 @@ router.delete('/deletePost', async (req, res) => {
 //Reading all the posts created by users
 router.get('/posts', async (req, res) => {
      const { skip, limit } = req.query;
-     const Posts = await Post.find().sort('-timestamp').skip(skip).limit(limit);
-     console.log(Posts);
+     const Posts = await Post.find()
+          .populate({
+               path: 'comments',
+               populate: {
+                    path: 'postedby',
+                    select: '-password'
+               }
+          })
+          .sort('-timestamp')
+          .skip(skip)
+          .limit(limit);
+
      res.status(200).send(Posts);
 })
 
@@ -131,7 +140,13 @@ router.put('/avatarUpdate', checkUser, async (req, res) => {
 router.get('/post/:id', async (req, res) => {
      try {
 
-          const post = await Post.findById(req.params.id);
+          const post = await Post.findById(req.params.id).populate({
+               path: 'comments',
+               populate: {
+                    path: 'postedby',
+                    select: '-password'
+               }
+          }).sort('-timestamp');
           res.status(200).send(post);
 
      } catch (error) {
